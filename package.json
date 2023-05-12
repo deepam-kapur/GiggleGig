@@ -1,0 +1,28 @@
+{
+  "name": "mixor",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/deepam-kapur/mixor.git"
+  },
+  "author": "Deepam Kapur <deepamkapur@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/deepam-kapur/mixor/issues"
+  },
+  "homepage": "https://github.com/deepam-kapur/mixor#readme",
+  "dependencies": {
+    "@types/express": "^4.17.17",
+    "@types/mysql": "^2.15.21",
+    "express": "^4.18.2",
+    "mysql2": "^3.3.1",
+    "sequelize": "^6.31.1",
+    "ts-node": "^10.9.1"
+  }
+}
