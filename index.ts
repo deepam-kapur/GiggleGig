@@ -49,7 +49,7 @@ app.post('/webhook/v1', async (req: Request, res: Response) => {
 });
 
 // Add support for GET requests to our webhook
-app.get("/webhook/v1", (req, res) => {
+app.get("/webhook/v1", (req: Request, res: Response) => {
   
   // Parse the query params
     let mode = req.query["hub.mode"];
