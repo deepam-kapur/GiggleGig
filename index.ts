@@ -27,7 +27,7 @@ app.post('/webhook/v1', async (req: Request, res: Response) => {
     // Get the request body
     console.log('Request-------------------');
     console.log('Body-------------------');
-    console.log(req.body);
+    console.dir(req.body, { depth: null });
     console.log('Headers-------------------');
     console.log(req.headers);
 
@@ -50,7 +50,7 @@ app.post('/webhook/v1', async (req: Request, res: Response) => {
 
 // Add support for GET requests to our webhook
 app.get("/webhook/v1", (req: Request, res: Response) => {
-  
+console.log('Headers -----------', req.headers, req.body, '----------------------------------------------------');  
   // Parse the query params
     let mode = req.query["hub.mode"];
     let token = req.query["hub.verify_token"];
@@ -71,7 +71,7 @@ app.get("/webhook/v1", (req: Request, res: Response) => {
   });
 
 // Start the server
-const PORT = 80;
+const PORT = 9000;
 app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`);
 });
