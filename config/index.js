@@ -1,9 +1,16 @@
 import { config } from 'dotenv';
+import path from 'path';
 
 import externalConfig from '../dynamics/.external.uri.config.json' assert { type: 'json' };
 import internalConfig from '../dynamics/.internal.uri.config.json' assert { type: 'json' };
 
-config({ path: '../dynamics/.env' });
+const __dirname = path.dirname(new URL(import.meta.url).pathname);
+const normalizedDirname = __dirname.substring(1);
+
+config({ path: path.normalize(`${normalizedDirname}/../dynamics/.env`) });
+
+
+console.log(path.normalize(`${normalizedDirname}/../dynamics/.env`));
 
 const defaultConfig = {
   PORT: 8080,

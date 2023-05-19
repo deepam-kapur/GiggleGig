@@ -1,6 +1,7 @@
 {
-    "extends": "airbnb-base",
-    "rules": {
+
+  "extends": "airbnb-base",
+  "rules": {
       "max-len": [
         "error",
         {
@@ -10,7 +11,15 @@
           "ignoreStrings": true,
           "ignoreTemplateLiterals": true
         }
-      ],
-      "no-underscore-dangle": "off"
-    }
+      ],      
+    "import/extensions": [
+      "error",
+      "ignorePackages",
+      {
+        "js": "always",
+        "json": "always"
+      }
+    ],
+    "no-unused-vars": "off"
+  }
 }

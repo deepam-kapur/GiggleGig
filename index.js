@@ -6,6 +6,7 @@ import { COMMON_ERROR_MESSAGE, STATUS_CODES } from './config/constants/common.co
 import routes from './routes/index.routes.js';
 
 import LogHelpers from './helpers/log.helpers.js';
+
 const Log = new LogHelpers('mixor-index');
 
 MixorDBInit();

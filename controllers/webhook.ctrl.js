@@ -1,5 +1,4 @@
 import LogHelpers from '../helpers/log.helpers.js';
-const Log = new LogHelpers('Webhook-Controller');
 
 import ErrorHelper from '../helpers/error.helpers.js';
 import InstagramMessageSvc from '../services/instagram.message.svc.js';
@@ -8,6 +7,8 @@ import { COMMON_ERROR_MESSAGE, STATUS_CODES, WEBHOOK_OBJECT_TYPE } from '../conf
 
 import ResponseHelpers from '../helpers/response.helpers.js';
 
+const Log = new LogHelpers('Webhook-Controller');
+
 const processWebhook = async (req, res) => {
   const { headers, body } = req;
   try {
@@ -15,7 +16,6 @@ const processWebhook = async (req, res) => {
     switch (object) {
       case WEBHOOK_OBJECT_TYPE.INSTAGRAM: {
         const entries = await Promise.allSettled(entry.map((entity) => entity && Promise.all(entity.messaging.map(InstagramMessageSvc.process))));
-        console.log(entries);
         break;
       }
       default: {
