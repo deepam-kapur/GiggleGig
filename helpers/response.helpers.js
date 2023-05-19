@@ -1,30 +1,33 @@
-import ErrorHelper from "./error.helpers";
+import ErrorHelper from './error.helpers.js';
 
 const send = (res, payload, code) => {
-    let contentType = 'application/json';
-    let returnPayload = JSON.stringify(payload);
+  let contentType = 'application/json';
+  let returnPayload = JSON.stringify(payload);
+  let finalCode = code;
 
-    if(payload instanceof ErrorHelper){
-        payload = payload.get();
-        
-        code = payload.code;
-        delete payload.code;
-        
-        returnPayload = JSON.stringify(payload);
-    } else if(payload instanceof Error){
-        contentType = 'text/plain';
-        returnPayload = payload.toString();
-    } else if(payload instanceof String || typeof payload === 'string'){
-        contentType = 'text/plain';
-        returnPayload = payload;
-    }
+  if (payload instanceof ErrorHelper) {
+    const errorPayload = payload.get();
 
-    !code && (code = 200);
+    finalCode = errorPayload.code;
+    delete errorPayload.code;
 
-    res.writeHead(code, { 'Content-Type': contentType, });
-    res.send(returnPayload);
+    returnPayload = JSON.stringify(errorPayload);
+  } else if (payload instanceof Error) {
+    contentType = 'text/plain';
+    returnPayload = payload.toString();
+  } else if (payload instanceof String || typeof payload === 'string') {
+    contentType = 'text/plain';
+    returnPayload = payload;
+  }
+
+  if (!finalCode) {
+    finalCode = 200;
+  }
+
+  res.writeHead(finalCode, { 'Content-Type': contentType });
+  res.send(returnPayload);
 };
 
 export default {
-    send,
+  send,
 };

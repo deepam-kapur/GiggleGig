@@ -1,6 +1,6 @@
 import express from 'express';
-import WebhookCtrl from '../controllers/webhook.ctrl';
-import Authorize from '../utils/authorize.utils';
+import WebhookCtrl from '../controllers/webhook.ctrl.js';
+import Authorize from '../utils/authorize.utils.js';
 
 const router = express.Router();
 

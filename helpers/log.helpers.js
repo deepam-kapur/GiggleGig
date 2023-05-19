@@ -1,20 +1,23 @@
-class Log {
-    #logFile;
-    constructor(value = 'Mixor'){
-        this.#logFile = value;
-    }
+class LogHelpers {
+  constructor(value = 'Mixor') {
+    this.logFile = value;
+  }
 
-    record(...value){
-        console.table(`Log File - ${this.#logFile}`, ...value);
-    }
+  record(...value) {
+    console.log(`Log - ${this.logFile} : `, ...value);
+  }
 
-    error(...value){
-        console.error(`Log File - ${this.#logFile}`, ...value);
-    }
+  error(...value) {
+    console.error(`Log - ${this.logFile} : `, ...value);
+  }
 
-    trace(...value){
-        console.trace(`Log File - ${this.#logFile}`, ...value);
-    }
+  trace(...value) {
+    console.trace(`Log - ${this.logFile} : `, ...value);
+  }
+
+  info(...value) {
+    console.log(`Log - ${this.logFile} : `, ...value);
+  }
 }
 
-export default Log;
+export default LogHelpers;

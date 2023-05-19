@@ -1,4 +1,9 @@
-require('dotenv').config({ path: '../dynamic/.env' });
+import { config } from 'dotenv';
+
+import externalConfig from '../dynamics/.external.uri.config.json' assert { type: 'json' };
+import internalConfig from '../dynamics/.internal.uri.config.json' assert { type: 'json' };
+
+config({ path: '../dynamics/.env' });
 
 const defaultConfig = {
   PORT: 8080,
@@ -6,9 +11,17 @@ const defaultConfig = {
 };
 
 const args = process.argv.slice(2);
-const argsConfig = args.reduce(final, arg => {
+const argsConfig = args.reduce((final, arg) => {
   const [key, value] = arg.split('=');
-  final[key] = value;
+  return { ...final, [key]: value };
 }, {});
 
-module.exports = Object.assign({}, defaultConfig, process.env, argsConfig);
+const mergedConfig = {
+  ...defaultConfig,
+  ...externalConfig,
+  ...internalConfig,
+  ...process.env,
+  ...argsConfig,
+};
+
+export default mergedConfig;
