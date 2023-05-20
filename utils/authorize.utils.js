@@ -5,7 +5,7 @@ import ResponseHelpers from '../helpers/response.helpers.js';
 
 import { COMMON_ERROR_MESSAGE, STATUS_CODES } from '../config/constants/common.constants.js';
 
-const { FB_TOKEN } = Config;
+const { FB_TOKEN, FB_SECRET } = Config;
 
 const check = (req, res, next) => {
   try {
@@ -14,8 +14,8 @@ const check = (req, res, next) => {
       throw ErrorHelper.create(COMMON_ERROR_MESSAGE.signature_not_valid, STATUS_CODES.ERROR.BAD_REQUEST);
     }
 
-    const buf = req.body;
-    const encryptedToken = Crypto.createHmac('sha256', FB_TOKEN).update(buf).digest('hex');
+    const buf = req.rawBody;
+    const encryptedToken = Crypto.createHmac('sha256', FB_SECRET).update(buf).digest('hex');
 
     if (signature !== encryptedToken) {
       throw ErrorHelper.create(COMMON_ERROR_MESSAGE.signature_not_valid, STATUS_CODES.ERROR.BAD_REQUEST);
