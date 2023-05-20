@@ -18,6 +18,10 @@ const pool = mysql.createPool({
   waitForConnections: true,
   connectionLimit: 50,
   queueLimit: 0,
+  ssl: {
+    // Enable SSL options here
+    rejectUnauthorized: true,
+  },
 });
 
 pool.on('error', (err) => {
@@ -32,7 +36,7 @@ pool.query = async function (sql, values) {
 };
 
 const init = () => {
-  pool.query('select 1');
+  pool.query('select 1').then(() => Log.info('Database Connected!'));
 };
 
 export {

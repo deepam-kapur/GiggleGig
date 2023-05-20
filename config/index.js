@@ -5,7 +5,7 @@ import externalConfig from '../dynamics/.external.uri.config.json' assert { type
 import internalConfig from '../dynamics/.internal.uri.config.json' assert { type: 'json' };
 
 const __dirname = path.dirname(new URL(import.meta.url).pathname);
-const normalizedDirname = __dirname.substring(1);
+const normalizedDirname = process.platform === 'win32' ? __dirname.substring(1): __dirname;
 
 config({ path: path.normalize(`${normalizedDirname}/../dynamics/.env`) });
 
