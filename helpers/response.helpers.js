@@ -24,8 +24,7 @@ const send = (res, payload, code) => {
     finalCode = 200;
   }
 
-  res.writeHead(finalCode, { 'Content-Type': contentType });
-  res.send(returnPayload);
+  res.status(finalCode).send(returnPayload);
 };
 
 export default {

@@ -4,7 +4,7 @@ import Authorize from '../utils/authorize.utils.js';
 
 const router = express.Router();
 
-router.post('/api/webhook/v1', Authorize.check, WebhookCtrl.processWebhook);
-router.get('/api/webhook/v1', Authorize.validate, WebhookCtrl.validateWebhook);
+router.post('/webhook/v1', Authorize.check, WebhookCtrl.processWebhook);
+router.get('/webhook/v1', Authorize.validate, WebhookCtrl.validateWebhook);
 
 export default router;

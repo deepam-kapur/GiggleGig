@@ -1,5 +1,6 @@
 import express from 'express';
 import ErrorHelper from './helpers/error.helpers.js';
+import ResponseHelper from './helpers/response.helpers.js';
 
 import { init as MixorDBInit } from './db/connections/mixor.db.js';
 import { COMMON_ERROR_MESSAGE, STATUS_CODES } from './config/constants/common.constants.js';
@@ -21,14 +22,14 @@ app.use(routes);
 
 app.use((req, res) => {
   const error = ErrorHelper.create(COMMON_ERROR_MESSAGE.url_not_found, STATUS_CODES.ERROR.NOT_FOUND);
-  ErrorHelper.send(res, error);
+  ResponseHelper.send(res, error);
 });
 
 app.use((err, req, res) => {
   Log.error(err.stack);
 
   const error = ErrorHelper.create(COMMON_ERROR_MESSAGE.invalid, STATUS_CODES.ERROR.DEFAULT);
-  ErrorHelper.send(res, error);
+  ResponseHelper.send(res, error);
 });
 
 // Start the server
