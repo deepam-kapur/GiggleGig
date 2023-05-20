@@ -1,8 +1,8 @@
 import ErrorHelper from './error.helpers.js';
 
 const send = (res, payload, code) => {
-  let contentType = 'application/json';
-  let returnPayload = JSON.stringify(payload);
+  const contentType = 'application/json';
+  let returnPayload = payload;
   let finalCode = code;
 
   if (payload instanceof ErrorHelper) {
@@ -11,20 +11,14 @@ const send = (res, payload, code) => {
     finalCode = errorPayload.code;
     delete errorPayload.code;
 
-    returnPayload = JSON.stringify(errorPayload);
-  } else if (payload instanceof Error) {
-    contentType = 'text/plain';
-    returnPayload = payload.toString();
-  } else if (payload instanceof String || typeof payload === 'string') {
-    contentType = 'text/plain';
-    returnPayload = payload;
+    returnPayload = errorPayload;
   }
 
   if (!finalCode) {
     finalCode = 200;
   }
 
-  res.status(finalCode).send(returnPayload);
+  res.status(finalCode).json(returnPayload);
 };
 
 export default {

@@ -12,8 +12,8 @@ class ErrorHelper extends Error {
     return {
       status: this.status,
       code: this.code,
-      payload: this.payload,
       message: this.message,
+      payload: this.payload || undefined,
     };
   }
 
