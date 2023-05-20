@@ -31,7 +31,11 @@ pool.on('error', (err) => {
 // Override the `query` method to log each query
 const originalQuery = pool.query;
 pool.query = async function (sql, values) {
-  Log.info('Executing query:', sql, 'with values:', values);
+  if(values){
+    Log.info('Executing query:', sql, 'with values:', values);
+  } else{
+    Log.info('Executing query:', sql);
+  }
   return originalQuery.apply(this, arguments);
 };
 

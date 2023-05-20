@@ -2,17 +2,12 @@
   "apps": [
     {
       "name": "mixor",
-      "script": "index.ts",
-      "interpreter": "/usr/bin/ts-node",
+      "script": "index.js",
+      "interpreter": "node",
       "watch": true,
       "ignore_watch": [
         "node_modules"
-      ],
-      "env": {
-        "NODE_ENV": "production",
-        "PEM_KEY": "key.pem",
-	"PEM_CERT": "cert.pem"
-      }
+      ]
     }
   ]
 }
