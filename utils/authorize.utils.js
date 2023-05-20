@@ -20,7 +20,7 @@ const check = (req, res, next) => {
     const buf = req.rawBody;
     const encryptedToken = Crypto.createHmac('sha256', FB_SECRET).update(buf).digest('hex');
 
-    if (signature !== encryptedToken) {
+    if (signature !== `sha256=${encryptedToken}`) {
       throw ErrorHelper.create(COMMON_ERROR_MESSAGE.signature_not_valid, STATUS_CODES.ERROR.BAD_REQUEST);
     }
   } catch (e) {
