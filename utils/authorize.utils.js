@@ -2,8 +2,11 @@ import Crypto from 'crypto';
 import Config from '../config/index.js';
 import ErrorHelper from '../helpers/error.helpers.js';
 import ResponseHelpers from '../helpers/response.helpers.js';
+import LogHelpers from '../helpers/log.helpers.js';
 
 import { COMMON_ERROR_MESSAGE, STATUS_CODES } from '../config/constants/common.constants.js';
+
+const Log = new LogHelpers('authorize-utils');
 
 const { FB_TOKEN, FB_SECRET } = Config;
 
@@ -21,6 +24,7 @@ const check = (req, res, next) => {
       throw ErrorHelper.create(COMMON_ERROR_MESSAGE.signature_not_valid, STATUS_CODES.ERROR.BAD_REQUEST);
     }
   } catch (e) {
+    Log.error(e, { body: req.body, headers: req.headers });
     return ResponseHelpers.send(res, e);
   }
   return next();
@@ -35,6 +39,7 @@ const validate = (req, res, next) => {
       throw ErrorHelper.create(COMMON_ERROR_MESSAGE.signature_not_valid, STATUS_CODES.ERROR.FORBIDDEN);
     }
   } catch (e) {
+    Log.error(e, { body: req.body, headers: req.headers });
     return ResponseHelpers.send(res, e);
   }
   return next();
