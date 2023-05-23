@@ -3,6 +3,7 @@ const COMMON_ERROR_MESSAGE = {
   url_not_found: 'URL not found',
   invalid: 'Something broke!',
   object_type_not_supported: 'Object type not supported',
+  api_giving_error: 'API giving error',
 };
 
 const STATUS_CODES = {

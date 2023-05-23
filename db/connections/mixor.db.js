@@ -1,50 +1,44 @@
-import mysql from 'mysql2/promise';
+import { Sequelize } from 'sequelize';
 import LogHelpers from '../../helpers/log.helpers.js';
-
 import Config from '../../config/index.js';
 
 const Log = new LogHelpers('Mixor.DB');
-
 Log.info('Connection establishing.....');
 
-// Create a connection pool
-const pool = mysql.createPool({
-  // MySQL database connection details
+// Create a Sequelize instance
+const sequelize = new Sequelize({
+  dialect: 'mysql',
   host: Config.DB_HOST,
-  user: Config.DB_USER,
-  password: Config.DB_PASSWORD,
-  database: Config.DB_NAME,
   port: Config.DB_PORT,
-  waitForConnections: true,
-  connectionLimit: 50,
-  queueLimit: 0,
-  ssl: {
-    // Enable SSL options here
-    rejectUnauthorized: true,
+  database: Config.DB_NAME,
+  username: Config.DB_USER,
+  password: Config.DB_PASSWORD,
+  define: {
+    timestamps: false, // Set to true if you want timestamps
+  },
+  logging: false, // Set to true if you want to see SQL logs
+  dialectOptions: {
+    ssl: {
+      // Enable SSL options here
+      rejectUnauthorized: true,
+    },
   },
 });
 
-pool.on('error', (err) => {
-  Log.error('Error in MySQL connection pool:', err);
-});
-
-// Override the `query` method to log each query
-const originalQuery = pool.query;
-pool.query = async function (sql, values) {
-  if (values) {
-    Log.info('Executing query:', sql, 'with values:', values);
-  } else {
-    Log.info('Executing query:', sql);
-  }
-  return originalQuery.apply(this, arguments);
-};
-
 const init = () => {
-  pool.query('select 1').then(() => Log.info('Database Connected!'));
+  // Test the connection
+  sequelize
+    .authenticate()
+    .then(() => {
+      Log.info('Database Connected!');
+    })
+    .catch((error) => {
+      Log.error('Unable to connect to the database:', error);
+    });
 };
 
 export {
   init,
 };
 
-export default pool;
+export default sequelize;

@@ -25,7 +25,7 @@ const processWebhook = async (req, res) => {
     return ResponseHelpers.send(res, 'EVENT_RECEIVED', STATUS_CODES.SUCCESS);
   } catch (e) {
     Log.error(e, { headers, body });
-    return ResponseHelpers.send(res, e);
+    return ResponseHelpers.send(res, 'EVENT_RECEIVED', STATUS_CODES.SUCCESS);
   }
 };
 
