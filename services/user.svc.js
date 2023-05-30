@@ -34,7 +34,7 @@ const fetchEligibleUser = async (user) => {
 
 const processUser = async (externalId) => {
   const user = await User.findOne({
-    attributes: ['id', 'external_id', 'last_fetched_at'],
+    attributes: [['id', 'user_id'], 'external_id', 'last_fetched_at'],
     where: {
       external_id: externalId,
     },

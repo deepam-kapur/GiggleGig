@@ -24,7 +24,7 @@ const getGroup = async (userId) => {
     where: { status: 'active' },
   });
 
-  return group[0];
+  return group && group[0];
 };
 
 const createWaitingGroup = async (userId) => {

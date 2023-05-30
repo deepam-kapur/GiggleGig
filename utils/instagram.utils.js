@@ -24,14 +24,12 @@ const fetchProfile = async (externalId) => {
   return response.data;
 };
 
-const sendMessage = async (externalId, recipientId, text) => {
-  const response = await Axios.get(`${facebook}/${FB_API_VERSION}/${externalId}/messages`, {
-    params: {
-      recipient: JSON.stringify({ id: recipientId }),
-      message: JSON.stringify({ text }),
-      access_token: FB_API_ACCESS_TOKEN,
-    },
-
+const sendMessage = async (externalId, recipientId, payload) => {
+  const response = await Axios.post(`${facebook}/${FB_API_VERSION}/me/messages/`, {
+    recipient: { id: recipientId },
+    message: payload,
+  }, {
+    params: { access_token: FB_API_ACCESS_TOKEN },
   });
   if (!response || response.status !== STATUS_CODES.SUCCESS) {
     throw ErrorHelper.create(COMMON_ERROR_MESSAGE.api_giving_error, STATUS_CODES.ERROR.BAD_REQUEST);

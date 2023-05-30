@@ -32,6 +32,10 @@ const Message = sequelize.define('Message', {
     type: DataTypes.BOOLEAN,
     allowNull: false,
   },
+  is_postback: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+  },
   created_at: {
     type: DataTypes.DATE,
     allowNull: false,
