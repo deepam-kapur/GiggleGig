@@ -1,6 +1,7 @@
 import Moment from 'moment';
 
 import User from '../db/models/user.models.js';
+import UserStatus from '../db/models/user.status.models.js';
 import InstagramUtils from '../utils/instagram.utils.js';
 
 import { USER_FETCH_AGAIN } from '../config/constants/user.constants.js';
@@ -8,6 +9,7 @@ import { USER_FETCH_AGAIN } from '../config/constants/user.constants.js';
 const fetchExternalUser = async (externalId) => {
   const profile = await InstagramUtils.fetchProfile(externalId);
   const user = {
+    external_id: externalId,
     name: profile.name,
     username: profile.username,
     profile_pic: profile.profile_pic,
@@ -15,6 +17,7 @@ const fetchExternalUser = async (externalId) => {
     is_verified_user: profile.is_verified_user ? 1 : 0,
     is_user_follow_business: profile.is_user_follow_business,
     last_fetched_at: Date.now(),
+    auth_status: 'authentic',
   };
 
   const newUser = await User.upsert(user);
@@ -38,15 +41,39 @@ const processUser = async (externalId) => {
     where: {
       external_id: externalId,
     },
+    raw: true,
   });
 
   if (user) {
     return fetchEligibleUser(user);
   }
 
-  return fetchExternalUser(user);
+  return fetchExternalUser(externalId);
+};
+
+const findOrCreateUserWaitlist = async (userId) => {
+  const [, created] = await UserStatus.findOrCreate({
+    where: { user_id: userId },
+    defaults: { status: 'waitlist' },
+  });
+
+  return { created };
+};
+
+const findExternalUserId = async (userId) => {
+  const user = await User.findOne({
+    attributes: ['external_id'],
+    where: {
+      id: userId,
+    },
+    raw: true,
+  });
+
+  return user?.external_id;
 };
 
 export default {
   processUser,
+  findOrCreateUserWaitlist,
+  findExternalUserId,
 };

@@ -9,8 +9,12 @@ import MessagesService from './messages.svc.js';
 import InstagramUtils from '../utils/instagram.utils.js';
 import ErrorHelper from '../helpers/error.helpers.js';
 
+import LogHelpers from '../helpers/log.helpers.js';
+
 import MessageTemplatesConstants from '../config/constants/message.templates.constants.js';
 import { COMMON_ERROR_MESSAGE, STATUS_CODES } from '../config/constants/common.constants.js';
+
+const Log = new LogHelpers('Webhook-Controller');
 
 const internalProcessMessage = async (externalPageId, userId, message) => {
   const { text, template } = message;
@@ -24,7 +28,8 @@ const internalProcessMessage = async (externalPageId, userId, message) => {
     }
   }
 
-  await InstagramUtils.sendMessage(externalPageId, userId, payload);
+  const externalId = await UserService.findExternalUserId(userId);
+  await InstagramUtils.sendMessage(externalPageId, externalId, payload);
 };
 
 const commandMessageReply = async (message, userId, groupUserId, externalPageId) => {
@@ -80,6 +85,20 @@ const commandMessageReply = async (message, userId, groupUserId, externalPageId)
       senderMessages.push({ template: 'standard' });
       break;
     }
+    case 'waitlist:created': {
+      senderMessages.push({
+        text: `You've been added to our waitlist. We will notify you once we will go live.
+                                  \nUntil then follow us to get updates. Cheers! 🥂`,
+      });
+      break;
+    }
+    case 'waitlist:already:created': {
+      senderMessages.push({
+        text: `You've been already added to our waitlist. We will notify you once we will go live. We are excited too but we are making sure to have all features we promised.
+                                  \nUntil then follow us to get updates. Cheers! 🥂`,
+      });
+      break;
+    }
     case 'terms': {
       senderMessages.push({ template: 'terms' });
       break;
@@ -93,14 +112,18 @@ const commandMessageReply = async (message, userId, groupUserId, externalPageId)
       senderMessages.push({ template: 'standard' });
       break;
     }
+    case 'standard': {
+      senderMessages.push({ template: 'standard' });
+      break;
+    }
     default: {
       break;
     }
   }
 
-  const promises = [];
-  promises.concat(senderMessages.map((senderMessage) => internalProcessMessage(externalPageId, userId, senderMessage)));
-  promises.concat(receiverMessages.map((receiverMessage) => internalProcessMessage(externalPageId, groupUserId, receiverMessage)));
+  let promises = [];
+  promises = promises.concat(senderMessages.map((senderMessage) => internalProcessMessage(externalPageId, userId, senderMessage)));
+  promises = promises.concat(receiverMessages.map((receiverMessage) => internalProcessMessage(externalPageId, groupUserId, receiverMessage)));
 
   await Promise.all(promises);
 };
@@ -114,18 +137,12 @@ const processCommand = async (command, userId, groupId, groupUserId, externalPag
     } else {
       replyMessageCode = 'exit:no_group_found';
     }
-  } else if (command === 'join') {
-    if (!groupId) {
-      const groupDetails = await GroupsService.joinGroup([userId]);
-      if (groupDetails.joined) {
-        replyMessageCode = 'join:success';
-        groupUserId = groupDetails.userId;
-        groupId = groupDetails.groupId;
-      } else {
-        replyMessageCode = 'join:waiting';
-      }
+  } else if (command === 'join_waitlist') {
+    const status = await UserService.findOrCreateUserWaitlist(userId);
+    if (status.created) {
+      replyMessageCode = 'waitlist:created';
     } else {
-      replyMessageCode = 'join:already_exists';
+      replyMessageCode = 'waitlist:already:created';
     }
   } else if (command === 'block') {
     if (groupId) {
@@ -139,17 +156,31 @@ const processCommand = async (command, userId, groupId, groupUserId, externalPag
   } else if (command === 'mixor') {
     replyMessageCode = 'mixor';
   }
+  // else if (command === 'join') {
+  //   if (!groupId) {
+  //     const groupDetails = await GroupsService.joinGroup([userId]);
+  //     if (groupDetails.joined) {
+  //       replyMessageCode = 'join:success';
+  //       groupUserId = groupDetails.userId;
+  //       groupId = groupDetails.groupId;
+  //     } else {
+  //       replyMessageCode = 'join:waiting';
+  //     }
+  //   } else {
+  //     replyMessageCode = 'join:already_exists';
+  //   }
+  // }
 
-  return commandMessageReply(replyMessageCode, userId, groupUserId, externalPageId);
+  await commandMessageReply(replyMessageCode, userId, groupUserId, externalPageId);
 };
 
 const processMessage = async (processingData, message, timestamp) => {
   const { is_echo: isEcho, text, mid: externalMessageId } = message;
   const {
-    user: { id: userId }, page: { id: pageId, external_page_id: externalPageId }, justLog, group,
+    user: { user_id: userId }, page: { id: pageId, external_page_id: externalPageId }, justLog, group,
   } = processingData;
-  const { group_id: groupId, group_user_id: groupUserId } = group;
-  if (!processingData.justLog && !isEcho) {
+  const { group_id: groupId, group_user_id: groupUserId } = group || {};
+  if (!justLog && !isEcho) {
     const isCommand = text.charAt(0) === '/';
     if (isCommand) {
       const command = text.substring(1);
@@ -164,46 +195,52 @@ const processMessage = async (processingData, message, timestamp) => {
 };
 
 const processPostback = async (processingData, message, timestamp) => {
-  const { payload, mid: externalMessageId } = message;
+  const { payload: command, mid: externalMessageId } = message;
   const {
-    user: { id: userId }, page: { id: pageId, external_page_id: externalPageId }, justLog, group,
+    user: { user_id: userId }, page: { id: pageId, external_page_id: externalPageId }, justLog, group,
   } = processingData;
-  const { group_id: groupId, group_user_id: groupUserId } = group;
-  await MessagesService.create(externalMessageId, payload, userId, pageId, timestamp, !justLog, groupId, true);
+  const { group_id: groupId, group_user_id: groupUserId } = group || {};
+
+  await processCommand(command, userId, groupId, groupUserId, externalPageId);
+
+  await MessagesService.create(externalMessageId, command, userId, pageId, timestamp, !justLog, groupId, true);
 };
 
 const process = async ({
   sender: { id: sender }, recipient: { id: recipient }, timestamp, message, postback,
 }) => {
   console.log(sender, recipient, timestamp, message);
+  try {
+    const [senderPage, receiverPage] = await Promise.all([
+      PagesService.getPage(sender),
+      PagesService.getPage(recipient),
+    ]);
 
-  const [senderPage, receiverPage] = await Promise.all([
-    PagesService.getPage(sender),
-    PagesService.getPage(recipient),
-  ]);
+    const user = await UserService.processUser(senderPage ? recipient : sender);
 
-  const user = await UserService.processUser(senderPage ? recipient : sender);
-
-  const processingData = {
-    justLog: !!senderPage,
-    user,
-    page: senderPage || receiverPage,
-    group: null,
-  };
-
-  const group = await GroupsService.getGroup(user.user_id);
-  if (group) {
-    const { id: groupId, group_users: [{ user_id: groupUserId }] } = group;
-    processingData.group = {
-      group_id: groupId,
-      group_user_id: groupUserId,
+    const processingData = {
+      justLog: !!senderPage,
+      user,
+      page: senderPage || receiverPage,
+      group: null,
     };
-  }
 
-  if (message) {
-    await processMessage(processingData, message, timestamp);
-  } else if (postback) {
-    await processPostback(processingData, postback, timestamp);
+    const group = await GroupsService.getGroup(user.user_id);
+    if (group) {
+      const { id: groupId, group_users: [{ user_id: groupUserId }] } = group;
+      processingData.group = {
+        group_id: groupId,
+        group_user_id: groupUserId,
+      };
+    }
+
+    if (message) {
+      await processMessage(processingData, message, timestamp);
+    } else if (postback) {
+      await processPostback(processingData, postback, timestamp);
+    }
+  } catch (e) {
+    Log.error(e);
   }
 };
 

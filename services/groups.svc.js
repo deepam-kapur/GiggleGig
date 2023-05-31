@@ -1,4 +1,5 @@
-import { Op, Sequelize } from 'sequelize';
+// @ts-nocheck
+import { Op, QueryTypes, Sequelize } from 'sequelize';
 
 import DB from '../db/connections/mixor.db.js';
 
@@ -11,13 +12,13 @@ const getGroup = async (userId) => {
     include: [{
       model: GroupUsers,
       as: 'sender_group_users',
-      on: { id: Sequelize.col('groups.group_id') },
+      on: { '$group.id$': Sequelize.col('sender_group_users.group_id') },
       where: { user_id: userId },
       attributes: [],
     }, {
       model: GroupUsers,
       as: 'group_users',
-      on: { id: Sequelize.col('groups.group_id') },
+      on: { '$group.id$': Sequelize.col('group_users.group_id') },
       where: { user_id: { [Op.ne]: userId } },
       attributes: [],
     }],
@@ -35,27 +36,28 @@ const createWaitingGroup = async (userId) => {
 
 const joinGroup = async (userId) => {
   const results = await DB.query(
-    `update groups g join group_users gu on g.id=gu.group_id 
+    `select g.id from groups g join group_users gu on g.id=gu.group_id 
       set status='active' 
     where status='waiting' 
     and not exists (select user_id from group_users where user_id=gu.user_id and 
-        group_id in (select group_id from group_users where user_id=:userId))`,
+        group_id in (select group_id from group_users where user_id=:userId)) limit 1`,
     {
       replacements: {
         userId,
       },
+      type: QueryTypes.SELECT,
     },
   );
 
   if (!results.length) {
     const groupId = await createWaitingGroup(userId);
-    return {groupId, joined: false};
+    return { groupId, joined: false };
   }
 
   // TODO: Fix this
-  const {group_id: groupId, user_id: userId} = results;
+  const [{ group_id: groupId, user_id: receiverId }] = results;
   await GroupUsers.create({ group_id: groupId, user_id: userId });
-  return {groupId, joined: true, userId };
+  return { groupId, joined: true, userId: receiverId };
 };
 
 const exitGroup = async (groupId, status = 'inactive') => {

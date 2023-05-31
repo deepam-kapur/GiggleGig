@@ -1,18 +1,14 @@
 import { DataTypes } from 'sequelize';
 import sequelize from '../connections/mixor.db.js';
 
-const GroupUser = sequelize.define('GroupUser', {
-  id: {
+const UserStatus = sequelize.define('user_status', {
+  user_id: {
     type: DataTypes.INTEGER.UNSIGNED,
     primaryKey: true,
     autoIncrement: true,
   },
-  group_id: {
-    type: DataTypes.INTEGER.UNSIGNED,
-    allowNull: false,
-  },
-  user_id: {
-    type: DataTypes.INTEGER.UNSIGNED,
+  status: {
+    type: DataTypes.STRING(255),
     allowNull: false,
   },
   created_at: {
@@ -26,11 +22,11 @@ const GroupUser = sequelize.define('GroupUser', {
     defaultValue: DataTypes.NOW,
   },
 }, {
-  tableName: 'group_users',
+  tableName: 'user_status',
   timestamps: false,
   charset: 'utf8mb4',
   collate: 'utf8mb4_0900_ai_ci',
   engine: 'InnoDB',
 });
 
-export default GroupUser;
+export default UserStatus;

@@ -22,7 +22,7 @@ const User = sequelize.define('User', {
     allowNull: false,
   },
   profile_pic: {
-    type: DataTypes.STRING(255),
+    type: DataTypes.STRING(2048),
     allowNull: true,
   },
   follower_count: {
@@ -42,6 +42,10 @@ const User = sequelize.define('User', {
     type: DataTypes.DATE,
     allowNull: false,
     defaultValue: DataTypes.NOW,
+  },
+  auth_status: {
+    type: DataTypes.STRING(255),
+    allowNull: false,
   },
   created_at: {
     type: DataTypes.DATE,

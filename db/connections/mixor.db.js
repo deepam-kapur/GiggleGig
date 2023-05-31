@@ -25,7 +25,7 @@ const sequelize = new Sequelize({
   },
 });
 
-const init = () => {
+const init = async () => {
   // Test the connection
   sequelize
     .authenticate()

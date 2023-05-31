@@ -6,13 +6,18 @@ const standard = {
       template_type: 'generic',
       elements: [{
         title: 'Hi, Stranger! Good to see you on mixor.',
-        subtitle: 'Please choose one of the below.',
+        subtitle: 'Please choose one of the below or click ☰ on top-right to see menu',
         image_url: 'https://github.com/fbsamples/original-coast-clothing/blob/main/public/looks/male-work.jpg',
         // default_action: {
         //   type: 'web_url',
         //   url: 'https://www.originalcoastclothing.com',
         // },
         buttons: [
+          {
+            type: 'postback',
+            title: 'Join Waitlist',
+            payload: 'join_waitlist',
+          },
           {
             type: 'postback',
             title: 'Know more about Mixor',
@@ -23,21 +28,7 @@ const standard = {
             title: 'Terms & Guidelines',
             payload: 'terms',
           },
-          {
-            type: 'postback',
-            title: 'Join Chat',
-            payload: 'join',
-          },
-          {
-            type: 'postback',
-            title: 'Exit Chat',
-            payload: 'exit',
-          },
-          {
-            type: 'postback',
-            title: 'Block Chat',
-            payload: 'block',
-          }],
+        ],
       }],
     },
   },
@@ -58,7 +49,7 @@ const terms = {
       elements: [{
         title: 'Terms & Guidelines',
         subtitle: 'We recommend you to go through all our guidelines. Before using mixor.',
-        image_url: 'https://photos.app.goo.gl/su6393d7dzbxwcNg9',
+        image_url: 'https://live.staticflickr.com/65535/52937976662_9f47ac68cf_b.jpg',
       }],
     },
   },

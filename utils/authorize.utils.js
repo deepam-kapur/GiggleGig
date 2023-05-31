@@ -12,6 +12,9 @@ const { FB_TOKEN, FB_SECRET } = Config;
 
 const check = (req, res, next) => {
   try {
+    if (Config.ENVIRONMENT === 'development') {
+      return next();
+    }
     const signature = req.headers['x-hub-signature-256'];
     if (!signature) {
       throw ErrorHelper.create(COMMON_ERROR_MESSAGE.signature_not_valid, STATUS_CODES.ERROR.BAD_REQUEST);
