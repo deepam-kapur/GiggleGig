@@ -7,7 +7,7 @@ const standard = {
       elements: [{
         title: 'Hi, Stranger! Good to see you on mixor.',
         subtitle: 'Please choose one of the below or click ☰ on top-right to see menu',
-        image_url: 'https://github.com/fbsamples/original-coast-clothing/blob/main/public/looks/male-work.jpg',
+        image_url: 'https://mixor.club/terms.png',
         // default_action: {
         //   type: 'web_url',
         //   url: 'https://www.originalcoastclothing.com',
