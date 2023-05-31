@@ -1,3 +1,6 @@
+import { fileURLToPath } from 'url';
+import path, { dirname } from 'path';
+
 import express from 'express';
 import ErrorHelper from './helpers/error.helpers.js';
 import ResponseHelper from './helpers/response.helpers.js';
@@ -12,11 +15,16 @@ import LogHelpers from './helpers/log.helpers.js';
 
 const Log = new LogHelpers('mixor-index');
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
 // @ts-ignore
 MixorDBInit().then(() => initModelsAssociation());
 
 // Create an Express.js application
 const app = express();
+
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Middleware to parse request body as JSON
 app.use(express.json({
