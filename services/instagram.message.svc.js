@@ -103,7 +103,7 @@ const commandMessageReply = async (message, userId, groupUserId, externalPageId)
       senderMessages.push({ template: 'terms' });
       break;
     }
-    case 'Mixor': {
+    case 'mixor': {
       senderMessages.push({ template: 'mixor' });
       break;
     }
