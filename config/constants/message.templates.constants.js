@@ -49,7 +49,7 @@ const terms = {
       elements: [{
         title: 'Terms & Guidelines',
         subtitle: 'We recommend you to go through all our guidelines. Before using mixor.',
-        image_url: 'https://live.staticflickr.com/65535/52937976662_9f47ac68cf_b.jpg',
+        image_url: 'https://mixor.club/terms.png',
       }],
     },
   },
