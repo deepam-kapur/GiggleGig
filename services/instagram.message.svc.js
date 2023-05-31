@@ -191,7 +191,7 @@ const processMessage = async (processingData, message, timestamp) => {
       await commandMessageReply('standard', userId, groupUserId, externalPageId);
     }
   }
-  await MessagesService.create(externalMessageId, text, userId, pageId, timestamp, !justLog, groupId);
+  !isEcho && await MessagesService.create(externalMessageId, text, userId, pageId, timestamp, !justLog, groupId);
 };
 
 const processPostback = async (processingData, message, timestamp) => {
