@@ -48,7 +48,11 @@ const terms = {
       template_type: 'generic',
       elements: [{
         title: 'Terms & Guidelines',
-        subtitle: 'We recommend you to go through all our guidelines. Before using mixor.',
+        subtitle: 'We recommend you to go through all our guidelines. Before using mixor. Click to open and read.',
+        default_action: {
+          type: 'web_url',
+          url: 'https://mixor.cloud/terms.png',
+        },
         image_url: 'https://mixor.cloud/terms.png',
       }],
     },
