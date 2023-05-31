@@ -209,7 +209,7 @@ const processPostback = async (processingData, message, timestamp) => {
 const process = async ({
   sender: { id: sender }, recipient: { id: recipient }, timestamp, message, postback,
 }) => {
-  console.log(sender, recipient, timestamp, message);
+  console.log(sender, recipient, timestamp, message, postback);
   try {
     const [senderPage, receiverPage] = await Promise.all([
       PagesService.getPage(sender),
