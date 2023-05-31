@@ -7,7 +7,7 @@ const standard = {
       elements: [{
         title: 'Hi, Stranger! Good to see you on mixor.',
         subtitle: 'Please choose one of the below or click ☰ on top-right to see menu',
-        image_url: 'https://mixor.club/terms.png',
+        image_url: 'https://mixor.cloud/terms.png',
         // default_action: {
         //   type: 'web_url',
         //   url: 'https://www.originalcoastclothing.com',
@@ -49,7 +49,7 @@ const terms = {
       elements: [{
         title: 'Terms & Guidelines',
         subtitle: 'We recommend you to go through all our guidelines. Before using mixor.',
-        image_url: 'https://mixor.club/terms.png',
+        image_url: 'https://mixor.cloud/terms.png',
       }],
     },
   },
