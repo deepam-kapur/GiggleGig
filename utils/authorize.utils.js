@@ -48,7 +48,27 @@ const validate = (req, res, next) => {
   return next();
 };
 
+const checkDiscord = (req, res, next) => {
+  try {
+    
+    console.log('--------------Discord Headers---------------');
+    console.log(req.headers);
+    
+    console.log('--------------Discord Query Params---------------');
+    console.log(req.query, req.params);
+
+    console.log('--------------Discord Query Body---------------');
+    console.log(req.body);
+
+  } catch (e) {
+    Log.error(e, { body: req.body, headers: req.headers });
+    return ResponseHelpers.send(res, e);
+  }
+  return next();
+};
+
 export default {
   check,
   validate,
+  checkDiscord,
 };
