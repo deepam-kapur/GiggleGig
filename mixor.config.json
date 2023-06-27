@@ -1,0 +1,14 @@
+{
+  "apps": [
+    {
+      "name": "mixor",
+      "script": "index.js",
+      "interpreter": "node",
+      "watch": true,
+      "ignore_watch": [
+        "node_modules"
+      ]
+    }
+  ]
+}
+
