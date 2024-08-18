@@ -10,6 +10,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
+import { Channels } from './Channels';
 import { Sessions } from './Sessions';
 
 @Entity()
@@ -22,6 +23,9 @@ export class Messages extends BaseEntity {
 
   @Column({ type: 'int', unsigned: true })
   session_id: number;
+
+  @Column({ type: 'int', unsigned: true })
+  channel_id: number;
 
   @Column({ type: 'varchar', length: 64 })
   thread_ts: string;
@@ -48,4 +52,11 @@ export class Messages extends BaseEntity {
     referencedColumnName: 'session_id',
   })
   session: Sessions;
+
+  @ManyToOne(() => Channels, (c) => c.channel_id)
+  @JoinColumn({
+    name: 'channel_id',
+    referencedColumnName: 'channel_id',
+  })
+  channel: Channels;
 }

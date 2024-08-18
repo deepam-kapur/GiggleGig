@@ -40,6 +40,7 @@ export enum STATUS {
 
 export enum SESSION_STATUS {
   IN_PROGRESS = 'in_progress',
+  HALF_TIME = 'half_time',
   COMPLETED = 'completed',
   FAILED = 'failed',
   TERMINATED = 'terminated',
