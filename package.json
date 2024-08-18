@@ -1,38 +1,60 @@
 {
-  "name": "mixor",
-  "version": "0.0.1",
+  "name": "giggle-gig",
+  "version": "1.0.0",
   "description": "",
-  "main": "index.js",
-  "type": "module",
   "scripts": {
-    "start": "node index.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "eslint .",
-    "lint-fix": "eslint . --fix"
+    "build": "rm -rf dist && npx tsc && npx tsc-alias",
+    "dist:api": "node ./dist/api/index.js",
+    "start:api": "ts-node ./src/api/index.ts",
+    "start": "npm run start:api",
+    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "test": "ts-node src/common/properties.ts"
+  },
+  "dependencies": {
+    "@slack/bolt": "^3.21.1",
+    "axios": "^1.7.4",
+    "body-parser": "^1.20.2",
+    "compression": "^1.7.4",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-async-errors": "^3.1.1",
+    "express-validator": "^7.2.0",
+    "lodash": "^4.17.21",
+    "mysql": "^2.18.1",
+    "node-cache": "^5.1.2",
+    "typeorm": "^0.3.20",
+    "typescript": "^5.5.4"
+  },
+  "devDependencies": {
+    "@types/compression": "^1.7.5",
+    "@types/cors": "^2.8.17",
+    "@types/express": "^4.17.21",
+    "@types/lodash": "^4.17.7",
+    "@types/node": "^22.2.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.57.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-airbnb-typescript": "^17.1.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-import": "^2.29.0",
+    "eslint-plugin-prettier": "^5.1.3",
+    "eslint-plugin-simple-import-sort": "^10.0.0",
+    "eslint-plugin-unused-imports": "^3.0.0",
+    "prettier": "^3.3.3",
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0"
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/deepam-kapur/mixor.git"
+    "url": "git+https://github.com/deepam-kapur/GiggleGig.git"
   },
-  "author": "Deepam Kapur <deepamkapur@gmail.com>",
+  "author": "Deepam Kapur",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/deepam-kapur/mixor/issues"
+    "url": "https://github.com/deepam-kapur/GiggleGig/issues"
   },
-  "homepage": "https://github.com/deepam-kapur/mixor#readme",
-  "dependencies": {
-    "axios": "^1.4.0",
-    "dotenv": "^16.0.3",
-    "express": "^4.18.2",
-    "https": "^1.0.0",
-    "moment": "^2.29.4",
-    "mysql2": "^3.3.1",
-    "node-cache": "^5.1.2",
-    "sequelize": "^6.31.1"
-  },
-  "devDependencies": {
-    "eslint": "^8.41.0",
-    "eslint-config-airbnb-base": "^15.0.0",
-    "eslint-plugin-import": "^2.25.2"
-  }
+  "homepage": "https://github.com/deepam-kapur/GiggleGig#readme"
 }

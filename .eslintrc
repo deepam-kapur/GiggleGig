@@ -1,0 +1,87 @@
+{
+    // Configuration for JavaScript files
+    "root": true,
+    "parser": "@typescript-eslint/parser",
+    "extends": [
+      "airbnb-base",
+      "plugin:prettier/recommended"
+    ],
+    "rules": {
+      "prettier/prettier": [
+        "error",
+        {
+          "singleQuote": true,
+          "endOfLine": "auto"
+        }
+      ] // Avoid conflict rule between Prettier and Airbnb Eslint
+    },
+    "overrides": [
+      // Configuration for TypeScript files
+      {
+        "files": ["**/*.ts"],
+        "plugins": ["@typescript-eslint", "unused-imports", "simple-import-sort"],
+        "extends": [
+          "airbnb-typescript",
+          "plugin:prettier/recommended"
+        ],
+        "parserOptions": {
+          "project": "./tsconfig.json"
+        },
+        "rules": {
+          "prettier/prettier": [
+            "error",
+            {
+              "singleQuote": true,
+              "endOfLine": "auto"
+            }
+          ], // Avoid conflict rule between Prettier and Airbnb Eslint
+          "react/jsx-filename-extension": [0],
+          "class-methods-use-this": "off",
+          "no-param-reassign": "off",
+          "no-await-in-loop": "off",
+          "import/extensions": "off", // Avoid missing file extension errors, TypeScript already provides a similar feature
+          "@typescript-eslint/comma-dangle": "off", // Avoid conflict rule between Eslint and Prettier
+          "@typescript-eslint/consistent-type-imports": "error", // Ensure `import type` is used when it"s necessary
+          "no-restricted-syntax": ["error", "ForInStatement", "LabeledStatement", "WithStatement"], // Overrides Airbnb configuration and enable no-restricted-syntax
+          "import/prefer-default-export": "off", // Named export is easier to refactor automatically
+          "simple-import-sort/imports": "error", // Import configuration for `eslint-plugin-simple-import-sort`
+          "simple-import-sort/exports": "error", // Export configuration for `eslint-plugin-simple-import-sort`
+          "import/order": "off", // Avoid conflict rule between `eslint-plugin-import` and `eslint-plugin-simple-import-sort`
+          "@typescript-eslint/no-unused-vars": "off",
+          "unused-imports/no-unused-imports": "error",
+          "unused-imports/no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
+          "no-shadow": "off",
+          "@typescript-eslint/no-shadow": "off",
+          "@typescript-eslint/padding-line-between-statements": [
+            2,
+            // Always require blank lines after directive (like "use-strict"), except between directives
+            { "blankLine": "always", "prev": "directive", "next": "*" },
+            { "blankLine": "any", "prev": "directive", "next": "directive" },
+            // Always require blank lines after import, except between imports
+            { "blankLine": "always", "prev": "import", "next": "*" },
+            { "blankLine": "any", "prev": "import", "next": "import" },
+            // Always require blank lines before and after every sequence of variable declarations and export
+            { "blankLine": "always", "prev": "*", "next": ["const", "let", "var", "export"] },
+            { "blankLine": "always", "prev": ["const", "let", "var", "export"], "next": "*" },
+            { "blankLine": "any", "prev": ["const", "let", "var", "export"], "next": ["const", "let", "var"] },
+            // Always require blank lines before and after class declaration, if, do/while, switch, try
+            { "blankLine": "always", "prev": "*", "next": ["if", "class", "for", "do", "while", "switch", "try"] },
+            { "blankLine": "always", "prev": ["if", "class", "for", "do", "while", "switch", "try"], "next": "*" },
+            { "blankLine": "any", "prev": ["const", "let"], "next": ["if"] },
+            // Always require blank lines before return statements
+            { "blankLine": "always", "prev": "*", "next": "return" }
+          ],
+          "import/no-extraneous-dependencies": "off",
+          "no-plusplus": "off",
+          "@typescript-eslint/no-extraneous-class": "off",
+          "@typescript-eslint/naming-convention": [
+            "error",  
+            {
+              "selector": "variable",
+              "format": ["camelCase", "PascalCase", "snake_case", "UPPER_CASE"]
+            }
+          ]
+        }
+      }
+    ]
+  }
