@@ -3,16 +3,22 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
+  ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 
 import { SESSION_STATUS } from '../../config/constants/common.constants';
+import { Channels } from './Channels';
 
 @Entity()
 export class Sessions extends BaseEntity {
   @PrimaryGeneratedColumn({ unsigned: true, type: 'int' })
   session_id: number;
+
+  @Column({ type: 'int', unsigned: true })
+  channel_id: number;
 
   @Column({ type: 'varchar', length: 64 })
   thread_ts: string;
@@ -32,4 +38,11 @@ export class Sessions extends BaseEntity {
 
   @UpdateDateColumn({ type: 'timestamp' })
   readonly updated_at?: Date;
+
+  @ManyToOne(() => Channels, (c) => c.channel_id)
+  @JoinColumn({
+    name: 'channel_id',
+    referencedColumnName: 'channel_id',
+  })
+  channel: Channels;
 }

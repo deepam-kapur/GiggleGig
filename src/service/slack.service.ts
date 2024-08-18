@@ -1,3 +1,6 @@
+import { addMinutes } from 'date-fns';
+import { Between, In, LessThanOrEqual } from 'typeorm';
+
 import {
   EVENT_SUBTYPE,
   EVENT_TYPE,
@@ -11,8 +14,12 @@ import {
   SLACK_SUCCESS_MESSAGE,
 } from '../config/constants/response.constants';
 import GG_INFO from '../config/constants/static/gg_info';
+import GG_MIDTIME from '../config/constants/static/gg_midtime';
+import GG_NO_RESULTS from '../config/constants/static/gg_no_results';
+import GG_NO_RESULTS_MIDTIME from '../config/constants/static/gg_no_results_midtime';
 import GG_PROMPT from '../config/constants/static/gg_prompt';
 import GG_REPLY from '../config/constants/static/gg_reply';
+import GG_RESULTS from '../config/constants/static/gg_results';
 import GG_START from '../config/constants/static/gg_start';
 import JOB_ROLES from '../config/constants/static/job_roles';
 import JOB_SKILLS from '../config/constants/static/job_skills';
@@ -85,6 +92,7 @@ const processMessage = async (
       thread_ts: session.thread_ts,
       latest_text: text,
       latest_timestamp: ts,
+      channel_id: authorizedData.channel.channel_id,
     },
   ]);
 
@@ -209,6 +217,7 @@ const processCommand = async (
     {
       thread_ts: ts,
       job_role: jobRole,
+      channel_id: authorizedData.channel.channel_id,
     },
   ]);
 
@@ -302,6 +311,7 @@ const processMessageType = async (
           user_id: user.user_id,
           latest_text: text,
           latest_timestamp: ts,
+          channel_id: channelUser.channel_id,
         },
       ]);
 
@@ -359,7 +369,12 @@ const eventCallback = async (event: any): Promise<undefined> => {
     },
   });
 
-  if (!(sessionUser?.session?.status === SESSION_STATUS.IN_PROGRESS)) {
+  if (
+    !(
+      sessionUser?.session?.status === SESSION_STATUS.IN_PROGRESS ||
+      sessionUser?.session?.status === SESSION_STATUS.HALF_TIME
+    )
+  ) {
     return;
   }
 
@@ -389,9 +404,153 @@ const eventCallback = async (event: any): Promise<undefined> => {
   }
 };
 
+const processResults = async (sessionId: number) => {
+  const sessionUsers = await SessionUsers.find({
+    where: {
+      session_id: sessionId,
+    },
+    relations: ['user'],
+  });
+
+  const leaderBoard = sessionUsers.reduce((data, sessionUser) => {
+    if (!sessionUser.score) {
+      return data;
+    }
+
+    if (!data[sessionUser.score]) {
+      data[sessionUser.score] = [];
+    }
+
+    data[sessionUser.score].push(sessionUser.user);
+
+    return data;
+  }, {});
+
+  let leadership = 1;
+
+  const leadershipEmojis = [
+    '🥇',
+    '🥈',
+    '🥉',
+    '4️⃣',
+    '5️⃣',
+    '6️⃣',
+    '7️⃣',
+    '8️⃣',
+    '9️⃣',
+    '🔟',
+  ];
+
+  let leadershipBlock = '';
+
+  for (const score of Object.keys(leaderBoard)) {
+    const emoji = leadershipEmojis[leadership - 1];
+
+    const users = leaderBoard[score];
+
+    leadershipBlock += `\n${emoji} - ${users.map((user: Users) => `<@${user.slack_user_id}`)}>`;
+
+    leadership++;
+  }
+
+  return { leadershipBlock, sessionExists: !!Object.keys(leaderBoard).length };
+};
+
+const completeSession = async (session: Sessions) => {
+  const { leadershipBlock, sessionExists } = await processResults(
+    session.session_id,
+  );
+
+  let blocks;
+  if (!sessionExists) {
+    blocks = [...GG_NO_RESULTS.blocks];
+  } else {
+    blocks = [...GG_RESULTS.blocks];
+
+    blocks[1].text.text = blocks[1].text.text.replace(
+      '@Results',
+      `${leadershipBlock}`,
+    );
+  }
+
+  await slackUtils.createMessage({
+    channel: session.channel.slack_channel_id,
+    blocks,
+    thread_ts: session.thread_ts,
+  });
+
+  await Sessions.update(
+    { session_id: session.session_id },
+    { status: SESSION_STATUS.COMPLETED },
+  );
+};
+
+const midSession = async (session: Sessions) => {
+  const { leadershipBlock, sessionExists } = await processResults(
+    session.session_id,
+  );
+
+  let blocks;
+  if (!sessionExists) {
+    blocks = [...GG_NO_RESULTS_MIDTIME.blocks];
+  } else {
+    blocks = [...GG_MIDTIME.blocks];
+
+    blocks[3].text.text = blocks[3].text.text.replace(
+      '@Results',
+      `${leadershipBlock}`,
+    );
+  }
+
+  await slackUtils.createMessage({
+    channel: session.channel.slack_channel_id,
+    blocks,
+    thread_ts: session.thread_ts,
+  });
+};
+
+const runCron = async () => {
+  // Process sessions in batches of 10
+  const batchSize = 10;
+
+  const midSessions = await Sessions.find({
+    where: {
+      created_at: Between(
+        addMinutes(new Date(), -35),
+        addMinutes(new Date(), -30),
+      ),
+      status: SESSION_STATUS.IN_PROGRESS,
+    },
+    relations: ['channel'],
+  });
+
+  for (let i = 0; i < midSessions.length; i += batchSize) {
+    const batch = midSessions.slice(i, i + batchSize);
+
+    // Execute midSession for each session_id in the current batch
+    await Promise.all(batch.map((session) => midSession(session)));
+  }
+
+  const completeSessions = await Sessions.find({
+    where: {
+      created_at: LessThanOrEqual(addMinutes(new Date(), -60)),
+      status: In([SESSION_STATUS.IN_PROGRESS, SESSION_STATUS.HALF_TIME]),
+    },
+    relations: ['channel'],
+  });
+
+  for (let i = 0; i < completeSessions.length; i += batchSize) {
+    const batch = completeSessions.slice(i, i + batchSize);
+
+    // Execute completeSession for each session_id in the current batch
+    await Promise.all(batch.map((session) => completeSession(session)));
+  }
+};
+
 export default {
   authorizeUserData,
   processCommand,
   processBlockAction,
   eventCallback,
+  runCron,
 };
