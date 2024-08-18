@@ -35,13 +35,19 @@ const PORT = process.env.PORT || 3001;
     // Error handling middleware
     // eslint-disable-next-line unused-imports/no-unused-vars
     app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+      if (process.env.NODE_ENV === 'production') {
+        return res.status(200).end();
+      }
+
       const status = err.status || 500;
       const message = err.message || 'Internal Server Error';
 
-      res.status(status).json({
+      console.log(err);
+
+      return res.status(status).json({
         success: false,
         message,
-        error: process.env.NODE_ENV === 'production' ? {} : err.stack, // Hide stack trace in production
+        error: err.stack, // Hide stack trace in production
       });
     });
 

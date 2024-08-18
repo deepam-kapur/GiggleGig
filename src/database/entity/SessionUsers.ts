@@ -23,10 +23,10 @@ export class SessionUsers extends BaseEntity {
   @Column({ unsigned: true, type: 'int' })
   user_id: number;
 
-  @Column({ unsigned: true, type: 'double' })
+  @Column({ unsigned: true, type: 'int', default: 0 })
   score: number;
 
-  @Column()
+  @Column({ nullable: true })
   appreciation: string;
 
   @Column()

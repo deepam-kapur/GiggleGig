@@ -5,7 +5,6 @@ import {
   Entity,
   Index,
   JoinColumn,
-  ManyToMany,
   ManyToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -19,7 +18,7 @@ export class ChannelUsers extends BaseEntity {
   @PrimaryGeneratedColumn({ unsigned: true, type: 'int' })
   channel_user_id: number;
 
-  @Column()
+  @Column({ unsigned: true, type: 'int' })
   channel_id: number;
 
   @Column({ unsigned: true, type: 'int' })
@@ -36,7 +35,7 @@ export class ChannelUsers extends BaseEntity {
   @JoinColumn({ name: 'user_id', referencedColumnName: 'user_id' })
   user: Users;
 
-  @ManyToMany(() => Channels, (channel) => channel.channel_id)
+  @ManyToOne(() => Channels, (channel) => channel.channel_id)
   @JoinColumn({ name: 'channel_id', referencedColumnName: 'channel_id' })
   channel: Channels;
 }

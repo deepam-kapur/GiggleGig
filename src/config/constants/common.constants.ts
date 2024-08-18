@@ -39,7 +39,6 @@ export enum STATUS {
 }
 
 export enum SESSION_STATUS {
-  STARTED = 'started',
   IN_PROGRESS = 'in_progress',
   COMPLETED = 'completed',
   FAILED = 'failed',

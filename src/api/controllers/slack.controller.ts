@@ -1,8 +1,8 @@
 import type { Request, Response } from 'express';
-import slackService from 'src/service/slack.service';
 
 import response from '../../common/response';
 import { SLACK_REQUEST_TYPE } from '../../config/constants/common.constants';
+import slackService from '../../service/slack.service';
 
 export default async (req: Request, res: Response) => {
   const { challenge, type, event } = req.body;

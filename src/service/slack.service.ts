@@ -1,8 +1,7 @@
-import llmUtils from 'src/utils/llm.utils';
-
 import {
   EVENT_SUBTYPE,
   EVENT_TYPE,
+  SESSION_STATUS,
   SLACK_COMMAND_TEXT,
   SLACK_INTERACTIVE_ACTIONS,
   STATUS,
@@ -25,6 +24,7 @@ import { Sessions } from '../database/entity/Sessions';
 import { SessionUsers } from '../database/entity/SessionUsers';
 import { Teams } from '../database/entity/Teams';
 import { Users } from '../database/entity/Users';
+import llmUtils from '../utils/llm.utils';
 import slackUtils from '../utils/slack.utils';
 import type {
   AuthorizeUserDataRequest,
@@ -196,10 +196,14 @@ const processCommand = async (
 
   blocks[1].text.text = blocks[1].text.text.replace('@JobRole', `${jobRole}`);
 
-  const { ts } = await slackUtils.createMessage({
+  const { ts, e } = await slackUtils.createMessage({
     channel: authorizedData.channel.slack_channel_id,
     blocks,
   });
+
+  if (e) {
+    return e;
+  }
 
   const [session] = await Sessions.save([
     {
@@ -250,23 +254,22 @@ const replyEmoji = async (channel: string, ts: string) => {
 };
 
 const passTheThreadToLLM = async (sessionUser: SessionUsers, text: string) => {
-  const prompt = GG_PROMPT.replace('@JobRole', sessionUser.session.job_role)
-    .replace('@AssignedSkills', sessionUser.assigned_skills)
-    .replace('@Response', text);
+  try {
+    const prompt = GG_PROMPT.replace('@JobRole', sessionUser.session.job_role)
+      .replace('@AssignedSkills', sessionUser.assigned_skills)
+      .replace('@Response', text);
 
-  const response = await llmUtils.processLLM(prompt);
+    const response = await llmUtils.processLLM(prompt);
 
-  await SessionUsers.update(
-    {
-      session_user_id: sessionUser.session_user_id,
-    },
-    {},
-  );
+    const jsonResponse = JSON.parse(response.response);
 
-  sessionUser.score = response.score;
-  sessionUser.appreciation = response.appreciation;
+    sessionUser.score = jsonResponse.score;
+    sessionUser.appreciation = jsonResponse.appreciation;
 
-  await sessionUser.save();
+    await sessionUser.save();
+  } catch (e) {
+    console.log('-----passTheThreadToLLM------', JSON.stringify(e));
+  }
 };
 
 const processMessageType = async (
@@ -328,7 +331,7 @@ const processMessageType = async (
     },
   ]);
 
-  await passTheThreadToLLM(sessionUser, text);
+  passTheThreadToLLM(sessionUser, text);
   await replyEmoji(channelUser.channel.slack_channel_id, ts);
 };
 
@@ -347,7 +350,7 @@ const eventCallback = async (event: any): Promise<undefined> => {
   }
 
   const sessionUser = await SessionUsers.findOne({
-    relations: ['Sesssion'],
+    relations: ['session'],
     where: {
       user_id: user.user_id,
       session: {
@@ -356,12 +359,12 @@ const eventCallback = async (event: any): Promise<undefined> => {
     },
   });
 
-  if (!(sessionUser?.session?.status === STATUS.ACTIVE)) {
+  if (!(sessionUser?.session?.status === SESSION_STATUS.IN_PROGRESS)) {
     return;
   }
 
   const channelUser = await ChannelUsers.findOne({
-    relations: ['Channels'],
+    relations: ['channel'],
     where: {
       user_id: user.user_id,
       channel: {

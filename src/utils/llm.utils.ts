@@ -7,7 +7,7 @@ const { LLM_URL } = config;
 
 const processLLM = async (prompt: string) => {
   const response = await axios.post(`${LLM_URL}/api/generate`, {
-    model: 'mistral',
+    model: 'llama3.1',
     prompt,
     format: 'json',
     stream: false,
