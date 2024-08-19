@@ -6,14 +6,35 @@ import type {
 
 import config from '../config';
 import GG_INVITE from '../config/constants/static/gg_invite';
+import { Installations } from '../database/entity/Installations';
 
-// Initializes your app with your bot token and signing secret
-const app = new App({
-  token: config.SLACK_BOT_TOKEN,
-  signingSecret: config.SLACK_SIGNING_SECRET,
-});
+const authorizeFn = async ({ team_id }) => {
+  const installation = await Installations.findOneBy({ team_id });
+  // Fetch team info from database
+  // Check for matching teamId and enterpriseId in the installations array
+  if (installation.team_id === team_id) {
+    // This is a match. Use these installation credentials.
+    return {
+      // You could also set userToken instead
+      botToken: installation.bot_token,
+      botId: installation.bot_id,
+      botUserId: installation.bot_user_id,
+    };
+  }
 
-const createMessage = async (payload: ChatPostMessageArguments) => {
+  throw new Error('No matching authorizations');
+};
+
+const createMessage = async (
+  team_id: number,
+  payload: ChatPostMessageArguments,
+) => {
+  const installation = await authorizeFn({ team_id });
+  const app = new App({
+    token: installation.botToken,
+    // authorize: authorizeFn,
+    signingSecret: config.SLACK_SIGNING_SECRET,
+  });
   const { client } = app;
 
   try {
@@ -40,7 +61,13 @@ const createMessage = async (payload: ChatPostMessageArguments) => {
   }
 };
 
-const replyEmoji = async (payload: ReactionsAddArguments) => {
+const replyEmoji = async (team_id: number, payload: ReactionsAddArguments) => {
+  const installation = await authorizeFn({ team_id });
+  const app = new App({
+    token: installation.botToken,
+    // authorize: authorizeFn,
+    signingSecret: config.SLACK_SIGNING_SECRET,
+  });
   const { client } = app;
 
   const { ok, error } = await client.reactions.add(payload);
@@ -49,7 +76,29 @@ const replyEmoji = async (payload: ReactionsAddArguments) => {
   }
 };
 
+const getOAuthAccess = async (code: string) => {
+  const app = new App({
+    signingSecret: config.SLACK_SIGNING_SECRET,
+    clientId: config.SLACK_CLIENT_ID,
+    clientSecret: config.SLACK_CLIENT_SECRET,
+  });
+
+  const response = await app.client.oauth.v2.access({
+    client_id: config.SLACK_CLIENT_ID,
+    client_secret: config.SLACK_CLIENT_SECRET,
+    code,
+    redirect_uri: config.SLACK_REDIRECT_URI,
+  });
+
+  if (!response.ok) {
+    throw new Error(`Unable to authorize on slack! ${response.error}`);
+  }
+
+  return response;
+};
+
 export default {
   createMessage,
   replyEmoji,
+  getOAuthAccess,
 };

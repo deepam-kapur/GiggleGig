@@ -26,7 +26,7 @@ const PORT = process.env.PORT || 3001;
 
     app.use(cors());
 
-    app.use('/slack', middleware.logMiddleware, middleware.checkToken, routes);
+    app.use('/slack', middleware.logMiddleware, routes);
 
     app.get('/health', (req: Request, res: Response) =>
       res.status(200).send({ message: 'OK' }),

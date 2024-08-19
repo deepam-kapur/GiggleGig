@@ -1,4 +1,6 @@
 import { addMinutes } from 'date-fns';
+import { Installations } from 'src/database/entity/Installations';
+import cryptoUtils from 'src/utils/crypto.utils';
 import { Between, In, LessThanOrEqual } from 'typeorm';
 
 import {
@@ -164,7 +166,7 @@ const processBlockAction = async (
     },
   ]);
 
-  const { ts } = await slackUtils.createMessage({
+  const { ts } = await slackUtils.createMessage(authorizedData.team.team_id, {
     channel: authorizedData.channel.slack_channel_id,
     mrkdwn: true,
     blocks,
@@ -204,10 +206,13 @@ const processCommand = async (
 
   blocks[1].text.text = blocks[1].text.text.replace('@JobRole', `${jobRole}`);
 
-  const { ts, e } = await slackUtils.createMessage({
-    channel: authorizedData.channel.slack_channel_id,
-    blocks,
-  });
+  const { ts, e } = await slackUtils.createMessage(
+    authorizedData.team.team_id,
+    {
+      channel: authorizedData.channel.slack_channel_id,
+      blocks,
+    },
+  );
 
   if (e) {
     return e;
@@ -228,7 +233,7 @@ const processCommand = async (
   return SLACK_SUCCESS_MESSAGE.SUCCESSFULLY_STARTED;
 };
 
-const replyEmoji = async (channel: string, ts: string) => {
+const replyEmoji = async (team_id: number, channel: string, ts: string) => {
   const reactionEmojis = [
     'raised_hands',
     'thumbsup',
@@ -259,7 +264,11 @@ const replyEmoji = async (channel: string, ts: string) => {
   const emoji =
     reactionEmojis[Math.floor(Math.random() * reactionEmojis.length)];
 
-  await slackUtils.replyEmoji({ channel, name: emoji, timestamp: ts });
+  await slackUtils.replyEmoji(team_id, {
+    channel,
+    name: emoji,
+    timestamp: ts,
+  });
 };
 
 const passTheThreadToLLM = async (sessionUser: SessionUsers, text: string) => {
@@ -342,7 +351,11 @@ const processMessageType = async (
   ]);
 
   passTheThreadToLLM(sessionUser, text);
-  await replyEmoji(channelUser.channel.slack_channel_id, ts);
+  await replyEmoji(
+    channelUser.channel.team_id,
+    channelUser.channel.slack_channel_id,
+    ts,
+  );
 };
 
 const eventCallback = async (event: any): Promise<undefined> => {
@@ -473,7 +486,7 @@ const completeSession = async (session: Sessions) => {
     );
   }
 
-  await slackUtils.createMessage({
+  await slackUtils.createMessage(session.channel.team_id, {
     channel: session.channel.slack_channel_id,
     blocks,
     thread_ts: session.thread_ts,
@@ -502,7 +515,7 @@ const midSession = async (session: Sessions) => {
     );
   }
 
-  await slackUtils.createMessage({
+  await slackUtils.createMessage(session.channel.team_id, {
     channel: session.channel.slack_channel_id,
     blocks,
     thread_ts: session.thread_ts,
@@ -547,10 +560,53 @@ const runCron = async () => {
   }
 };
 
+const authorizeBot = async (code) => {
+  const response = await slackUtils.getOAuthAccess(code);
+
+  const [team] = await Teams.save([
+    {
+      slack_team_id: response.team.id,
+      name: response.team?.name,
+      slack_enterprise_id: response.enterprise.id,
+      slack_enterprise_name: response.enterprise.name,
+    },
+  ]);
+
+  await Channels.save([
+    {
+      name: response.incoming_webhook?.channel,
+      slack_channel_id: response.incoming_webhook?.channel_id,
+      team_id: team?.team_id,
+    },
+  ]);
+
+  const [user] = await Users.save([
+    {
+      slack_user_id: response.authed_user.id,
+      team_id: team.team_id,
+    },
+  ]);
+
+  const encryptedToken = cryptoUtils.encrypt(response.access_token);
+
+  await Installations.save([
+    {
+      team_id: team.team_id,
+      enterprise_id: response.enterprise.id,
+      bot_user_id: response.bot_user_id,
+      authed_user_id: user.user_id,
+      scope: response.scope,
+      access_token: encryptedToken.encrypted,
+      version: encryptedToken.version,
+    },
+  ]);
+};
+
 export default {
   authorizeUserData,
   processCommand,
   processBlockAction,
   eventCallback,
   runCron,
+  authorizeBot,
 };
