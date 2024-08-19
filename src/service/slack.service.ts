@@ -1,6 +1,4 @@
 import { addMinutes } from 'date-fns';
-import { Installations } from 'src/database/entity/Installations';
-import cryptoUtils from 'src/utils/crypto.utils';
 import { Between, In, LessThanOrEqual } from 'typeorm';
 
 import {
@@ -27,12 +25,14 @@ import JOB_ROLES from '../config/constants/static/job_roles';
 import JOB_SKILLS from '../config/constants/static/job_skills';
 import { Channels } from '../database/entity/Channels';
 import { ChannelUsers } from '../database/entity/ChannelUsers';
+import { Installations } from '../database/entity/Installations';
 import { Messages } from '../database/entity/Messages';
 import { MessagesHistory } from '../database/entity/MessagesHistory';
 import { Sessions } from '../database/entity/Sessions';
 import { SessionUsers } from '../database/entity/SessionUsers';
 import { Teams } from '../database/entity/Teams';
 import { Users } from '../database/entity/Users';
+import cryptoUtils from '../utils/crypto.utils';
 import llmUtils from '../utils/llm.utils';
 import slackUtils from '../utils/slack.utils';
 import type {
@@ -560,46 +560,62 @@ const runCron = async () => {
   }
 };
 
-const authorizeBot = async (code) => {
+const authorizeBot = async (code: string) => {
   const response = await slackUtils.getOAuthAccess(code);
 
-  const [team] = await Teams.save([
-    {
-      slack_team_id: response.team.id,
-      name: response.team?.name,
-      slack_enterprise_id: response.enterprise.id,
-      slack_enterprise_name: response.enterprise.name,
-    },
-  ]);
+  let team = await Teams.findOneBy({ slack_team_id: response.team?.id });
+  if (!team) {
+    [team] = await Teams.save([
+      {
+        slack_team_id: response.team?.id,
+        name: response.team?.name,
+        slack_enterprise_id: response.enterprise?.id || null,
+        slack_enterprise_name: response.enterprise?.name || null,
+      },
+    ]);
+  }
 
-  await Channels.save([
-    {
-      name: response.incoming_webhook?.channel,
-      slack_channel_id: response.incoming_webhook?.channel_id,
-      team_id: team?.team_id,
-    },
-  ]);
+  const channel = await Channels.findOneBy({
+    slack_channel_id: response.incoming_webhook?.channel_id,
+  });
+  if (!channel) {
+    await Channels.save([
+      {
+        name: response.incoming_webhook?.channel,
+        slack_channel_id: response.incoming_webhook?.channel_id,
+        team_id: team?.team_id,
+      },
+    ]);
+  }
 
-  const [user] = await Users.save([
-    {
-      slack_user_id: response.authed_user.id,
-      team_id: team.team_id,
-    },
-  ]);
+  let user = await Users.findOneBy({
+    slack_user_id: response.authed_user.id,
+  });
+  if (!user) {
+    [user] = await Users.save([
+      {
+        slack_user_id: response.authed_user.id,
+        team_id: team.team_id,
+      },
+    ]);
+  }
 
   const encryptedToken = cryptoUtils.encrypt(response.access_token);
 
-  await Installations.save([
-    {
-      team_id: team.team_id,
-      enterprise_id: response.enterprise.id,
-      bot_user_id: response.bot_user_id,
-      authed_user_id: user.user_id,
-      scope: response.scope,
-      access_token: encryptedToken.encrypted,
-      version: encryptedToken.version,
-    },
-  ]);
+  await Installations.upsert(
+    [
+      {
+        team_id: team.team_id,
+        enterprise_id: response.enterprise?.id || null,
+        bot_user_id: response.bot_user_id,
+        authed_user_id: user.user_id,
+        scope: response.scope,
+        bot_token: encryptedToken.encrypted,
+        token_version: encryptedToken.version,
+      },
+    ],
+    ['bot_token', 'token_version', 'scope', 'authed_user_id', 'bot_user_id'],
+  );
 };
 
 export default {

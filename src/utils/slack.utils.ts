@@ -78,6 +78,7 @@ const replyEmoji = async (team_id: number, payload: ReactionsAddArguments) => {
 
 const getOAuthAccess = async (code: string) => {
   const app = new App({
+    authorize: ({ teamId }) => authorizeFn({ team_id: teamId }),
     signingSecret: config.SLACK_SIGNING_SECRET,
     clientId: config.SLACK_CLIENT_ID,
     clientSecret: config.SLACK_CLIENT_SECRET,

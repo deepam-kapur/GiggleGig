@@ -17,7 +17,7 @@ export class Teams extends BaseEntity {
   @Column({ type: 'varchar', length: 512 })
   name: string;
 
-  @Column({ type: 'varchar', length: 64 })
+  @Column({ type: 'varchar', length: 64, unique: true })
   slack_team_id: string;
 
   @Column({ type: 'varchar', length: 64, nullable: true })

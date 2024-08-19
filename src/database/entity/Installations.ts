@@ -18,7 +18,7 @@ export class Installations extends BaseEntity {
   @PrimaryGeneratedColumn({ unsigned: true, type: 'int' })
   installation_id: number;
 
-  @Column({ unsigned: true, type: 'int' })
+  @Column({ unsigned: true, type: 'int', unique: true })
   team_id: number;
 
   @Column({ unsigned: true, type: 'int' })
@@ -31,19 +31,16 @@ export class Installations extends BaseEntity {
   bot_token: string;
 
   @Column()
+  token_version: string;
+
+  @Column({ nullable: true })
   bot_id: string;
 
   @Column()
   bot_user_id: string;
 
-  @Column()
+  @Column({ nullable: true })
   scope: string;
-
-  @Column()
-  access_token: string;
-
-  @Column()
-  version: string;
 
   @CreateDateColumn({ type: 'timestamp' })
   @Index()

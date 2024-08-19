@@ -18,7 +18,7 @@ export class Users extends BaseEntity {
   @PrimaryGeneratedColumn({ unsigned: true, type: 'int' })
   user_id: number;
 
-  @Column()
+  @Column({ unique: true })
   slack_user_id: string;
 
   @Column({ unsigned: true, type: 'int' })

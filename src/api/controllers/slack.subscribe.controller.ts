@@ -6,7 +6,9 @@ import slackService from '../../service/slack.service';
 export default async (req: Request, res: Response) => {
   const { code } = req.query;
 
-  await slackService.authorizeBot(code);
+  if (code) {
+    await slackService.authorizeBot(code as string);
+  }
 
   const objResponse = response(res);
 
