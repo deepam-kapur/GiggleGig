@@ -7,16 +7,19 @@ import type {
 import config from '../config';
 import GG_INVITE from '../config/constants/static/gg_invite';
 import { Installations } from '../database/entity/Installations';
+import cryptoUtils from './crypto.utils';
 
 const authorizeFn = async ({ team_id }) => {
   const installation = await Installations.findOneBy({ team_id });
   // Fetch team info from database
   // Check for matching teamId and enterpriseId in the installations array
   if (installation.team_id === team_id) {
+    const decryptedToken = cryptoUtils.encrypt(installation.bot_token);
+
     // This is a match. Use these installation credentials.
     return {
       // You could also set userToken instead
-      botToken: installation.bot_token,
+      botToken: decryptedToken,
       botId: installation.bot_id,
       botUserId: installation.bot_user_id,
     };
