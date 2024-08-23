@@ -21,7 +21,7 @@ export default {
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: ':medal_gold: *1st Place:*\n- _No submissions yet!_\n:medal_silver: *2nd Place:*\n- _The spot is yours for the taking!_\n:medal_bronze: *3rd Place:*\n- _Why not aim for the top?_',
+        text: '🥇 *1st Place:*\n- _No submissions yet!_\n🥈 *2nd Place:*\n- _The spot is yours for the taking!_\n🥉 *3rd Place:*\n- _Why not aim for the top?_',
       },
     },
     {
