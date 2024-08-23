@@ -14,7 +14,10 @@ const authorizeFn = async ({ team_id }) => {
   // Fetch team info from database
   // Check for matching teamId and enterpriseId in the installations array
   if (installation.team_id === team_id) {
-    const decryptedToken = cryptoUtils.encrypt(installation.bot_token);
+    const decryptedToken = cryptoUtils.decrypt(
+      installation.bot_token,
+      installation.token_version,
+    );
 
     // This is a match. Use these installation credentials.
     return {
