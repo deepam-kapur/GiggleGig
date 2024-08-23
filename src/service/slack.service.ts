@@ -520,6 +520,11 @@ const midSession = async (session: Sessions) => {
     blocks,
     thread_ts: session.thread_ts,
   });
+
+  await Sessions.update(
+    { session_id: session.session_id },
+    { status: SESSION_STATUS.HALF_TIME },
+  );
 };
 
 const runCron = async () => {
