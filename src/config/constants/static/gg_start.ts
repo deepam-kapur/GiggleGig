@@ -6,7 +6,7 @@ export default {
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: '🎉 *<@user>* has just started a game of GiggleGig!** 🎉',
+        text: '🎉 *<@user>* has just started a game of *GiggleGig*! 🎉',
       },
     },
     {

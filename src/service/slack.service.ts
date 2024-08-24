@@ -1,4 +1,5 @@
 import { addMinutes } from 'date-fns';
+import _ from 'lodash';
 import { Between, In, LessThanOrEqual } from 'typeorm';
 
 import {
@@ -130,7 +131,7 @@ const processBlockAction = async (
     return;
   }
 
-  const blocks = [...GG_REPLY.blocks];
+  const blocks = _.cloneDeep(GG_REPLY.blocks);
 
   blocks[1].text.text = blocks[1].text.text.replace(
     '@user',
@@ -186,7 +187,7 @@ const processCommand = async (
   authorizedData: AuthorizeUserDataResponse,
 ): Promise<string | any> => {
   if (text === SLACK_COMMAND_TEXT.INFO) {
-    const blocks = [...GG_INFO.blocks];
+    const blocks = _.cloneDeep(GG_INFO.blocks);
 
     return { blocks };
   }
@@ -197,7 +198,7 @@ const processCommand = async (
 
   const jobRole = JOB_ROLES[Math.floor(Math.random() * JOB_ROLES.length)];
 
-  const blocks = [...GG_START.blocks];
+  const blocks = _.cloneDeep(GG_START.blocks);
 
   blocks[0].text.text = blocks[0].text.text.replace(
     '@user',
@@ -225,6 +226,8 @@ const processCommand = async (
       channel_id: authorizedData.channel.channel_id,
     },
   ]);
+
+  console.log('Sessions Details ------ ', session, ts);
 
   await processMessage(authorizedData, session, ts, 'STARTING!');
 
@@ -476,9 +479,9 @@ const completeSession = async (session: Sessions) => {
 
   let blocks;
   if (!sessionExists) {
-    blocks = [...GG_NO_RESULTS.blocks];
+    blocks = _.cloneDeep(GG_NO_RESULTS.blocks);
   } else {
-    blocks = [...GG_RESULTS.blocks];
+    blocks = _.cloneDeep(GG_RESULTS.blocks);
 
     blocks[1].text.text = blocks[1].text.text.replace(
       '@Results',
@@ -505,9 +508,9 @@ const midSession = async (session: Sessions) => {
 
   let blocks;
   if (!sessionExists) {
-    blocks = [...GG_NO_RESULTS_MIDTIME.blocks];
+    blocks = _.cloneDeep(GG_NO_RESULTS_MIDTIME.blocks);
   } else {
-    blocks = [...GG_MIDTIME.blocks];
+    blocks = _.cloneDeep(GG_MIDTIME.blocks);
 
     blocks[3].text.text = blocks[3].text.text.replace(
       '@Results',
