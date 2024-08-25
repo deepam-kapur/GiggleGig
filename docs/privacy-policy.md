@@ -1,7 +1,5 @@
 # Privacy Policy for GiggleGig Slack App
 
-**Effective Date: [Insert Date]**
-
 At GiggleGig, we value your privacy and want to be clear about how we handle your information. This Privacy Policy explains what information we collect, how we use it, and your rights.
 
 ## 1. Information We Collect
@@ -33,7 +31,7 @@ At GiggleGig, we value your privacy and want to be clear about how we handle you
 
 ## 7. Contact Us
 
-If you have any questions or concerns about this Privacy Policy, please contact us at [Your Contact Information].
+If you have any questions or concerns about this Privacy Policy, please contact us at contact@gigglegig.fun.
 
 ---
 

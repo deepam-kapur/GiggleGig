@@ -26,6 +26,19 @@ const PORT = process.env.PORT || 3001;
 
     app.use(cors());
 
+    app.use((req: Request, res: Response, next) => {
+      // Check if the request path starts with /slack
+      if (req.path.startsWith('/slack')) {
+        return next(); // Skip the redirect for /slack paths
+      }
+
+      // Construct the new URL
+      const redirectUrl = `https://web.gigglegig.fun${req.originalUrl}`;
+
+      // Redirect the request
+      return res.redirect(301, redirectUrl);
+    });
+
     app.use('/slack', middleware.logMiddleware, routes);
 
     app.get('/health', (req: Request, res: Response) =>
