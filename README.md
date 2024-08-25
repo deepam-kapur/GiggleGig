@@ -7,14 +7,15 @@ GiggleGig is a fun and interactive Slack game where participants are assigned ra
 ![License](https://img.shields.io/badge/license-MIT-blue)
 
 ## Table of Contents
-- [Introduction](#introduction)
-- [Requirements](#requirements)
-- [Installation](#installation)
-- [Usage](#usage)
-- [Features](#features)
-- [Contributing](#contributing)
-- [License](#license)
-- [Contact](#contact)
+- [GiggleGig](#gigglegig)
+  - [Table of Contents](#table-of-contents)
+  - [Introduction](#introduction)
+  - [Requirements](#requirements)
+  - [Installation](#installation)
+  - [Usage](#usage)
+    - [Example](#example)
+  - [Screenshots Examples](#screenshots-examples)
+  - [Features](#features)
 
 ## Introduction
 
@@ -68,7 +69,11 @@ To play GiggleGig in your Slack workspace:
 
 ### Example
 
-![GiggleGig Example](example_screenshot.png)
+## Screenshots Examples
+When you hit `/gg start`
+![GiggleGig Start](./docs/assets/screenshot-1.png)
+When you hit Count me In button you get
+![GiggleGig Assign](./docs/assets/screenshot-2.png)
 
 ## Features
 

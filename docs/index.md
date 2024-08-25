@@ -15,6 +15,13 @@ To start playing, follow these steps:
 3. **Start a Game**  
    Once installed, start a game by typing `/gg start` in any channel. GiggleGig will assign random skills and roles, and the fun begins!
 
+## Screenshots Examples
+When you hit `/gg start`
+![GiggleGig Start](./assets/screenshot-1.png)
+
+When you hit Count me In button you get
+![GiggleGig Assign](./assets/screenshot-2.png)
+
 ## Need Help?
 If you need further assistance, feel free to reach out to us at [contact@gigglegig.fun](mailto:contact@gigglegig.fun). Our support team is here to help you with any issues or questions you might have.
 
