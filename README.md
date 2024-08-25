@@ -10,16 +10,24 @@ GiggleGig is a fun and interactive Slack game where participants are assigned ra
 - [GiggleGig](#gigglegig)
   - [Table of Contents](#table-of-contents)
   - [Introduction](#introduction)
+    - [Example](#example)
+  - [Screenshots Examples](#screenshots-examples)
   - [Requirements](#requirements)
   - [Installation](#installation)
   - [Usage](#usage)
-    - [Example](#example)
-  - [Screenshots Examples](#screenshots-examples)
   - [Features](#features)
 
 ## Introduction
 
 GiggleGig is designed to add some light-hearted fun to your Slack workspace. Whether you're looking for a team-building activity or just some entertainment during breaks, GiggleGig is here to bring laughter and creativity to the table.
+
+### Example
+
+## Screenshots Examples
+When you hit `/gg start`
+![GiggleGig Start](./docs/assets/screenshot-1.png)
+When you hit Count me In button you get
+![GiggleGig Assign](./docs/assets/screenshot-2.png)
 
 ## Requirements
 
@@ -66,14 +74,6 @@ To play GiggleGig in your Slack workspace:
 3. Each participant will receive a random job role and three unique skills.
 4. Convince the AI judge why those skills make you the perfect candidate for the job role!
 5. Type `/gg info` to get detailed information about the game.
-
-### Example
-
-## Screenshots Examples
-When you hit `/gg start`
-![GiggleGig Start](./docs/assets/screenshot-1.png)
-When you hit Count me In button you get
-![GiggleGig Assign](./docs/assets/screenshot-2.png)
 
 ## Features
 
