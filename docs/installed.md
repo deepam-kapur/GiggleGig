@@ -9,7 +9,6 @@ Congratulations! You have successfully installed **GiggleGig** on your Slack wor
 - Explore the available commands by typing `/gg help`.
 
 ### 2. Customize Your Experience
-- Configure your game settings using the `/gg settings` command.
 - Invite your teammates to join the fun!
 
 ### 3. Need Help?
