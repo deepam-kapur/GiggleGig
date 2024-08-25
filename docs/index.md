@@ -17,7 +17,7 @@ To start playing, follow these steps:
 
 ## Need Help?
 
-Check out our [Installation Guide](#installation-guide) below for detailed steps and screenshots.
+Check out our [Installation Guide](installation.md) below for detailed steps and screenshots.
 
 ---
 

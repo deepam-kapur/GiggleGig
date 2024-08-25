@@ -16,7 +16,7 @@ It looks like something went wrong while trying to install **GiggleGig**.
 - If you're still having trouble, please reach out to our support team at [contact@gigglegig.fun](mailto:contact@gigglegig.fun). We'll help you get GiggleGig up and running as quickly as possible.
 
 ### 4. Visit the Installation Guide
-- Follow our [Installation Guide](https://web.gigglegig.fun/install-guide) for step-by-step instructions.
+- Follow our [Installation Guide](https://web.gigglegig.fun/) for step-by-step instructions.
 
 We apologize for the inconvenience and appreciate your patience.
 
