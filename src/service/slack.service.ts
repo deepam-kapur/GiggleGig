@@ -62,9 +62,9 @@ const authorizeUserData = async ({
     [user] = await Users.save([{ slack_user_id, team_id: team?.team_id }]);
   }
 
-  if (!channel) {
+  if (!channel && team) {
     [channel] = await Channels.save([
-      { slack_channel_id, name: slack_channel_name },
+      { slack_channel_id, name: slack_channel_name, team_id: team?.team_id },
     ]);
   }
 
