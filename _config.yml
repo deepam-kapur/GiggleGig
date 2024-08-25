@@ -1,0 +1,6 @@
+title: GiggleGig
+description: GiggleGig is the ultimate game where job roles collide with hilariously random skills! Imagine trying to convince an AI judge that being a master of balloon animals or an expert in extreme napping makes you the perfect candidate for a lawyer or a brain surgeon. 
+
+remote_theme: pages-themes/architect@v0.2.0
+plugins:
+- jekyll-remote-theme
