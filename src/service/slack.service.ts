@@ -463,7 +463,7 @@ const eventCallback = async (event: any): Promise<boolean> => {
       return true;
     }
     case EVENT_TYPE.USER_CHANGE: {
-      await messageCallback(event);
+      await userCallback(event);
 
       return true;
     }
