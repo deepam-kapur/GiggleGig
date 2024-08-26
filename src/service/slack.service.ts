@@ -361,17 +361,13 @@ const processMessageType = async (
   );
 };
 
-const eventCallback = async (event: any): Promise<undefined> => {
+const messageCallback = async (event) => {
   const {
     type,
     user: slack_user_id,
     thread_ts: threadTs,
     channel: slack_channel_id,
   } = event;
-
-  if (type !== EVENT_TYPE.MESSAGE) {
-    return;
-  }
 
   const user = await Users.findOneBy({ slack_user_id });
 
@@ -420,6 +416,59 @@ const eventCallback = async (event: any): Promise<undefined> => {
     }
     default: {
       // throw new Error('Not Valid Message Type');
+    }
+  }
+};
+
+const userCallback = async (event: any) => {
+  const {
+    user: {
+      id: slack_user_id,
+      team_id: slack_team_id,
+      profile: { image_original: profile_image, first_name, last_name },
+    },
+  } = event;
+
+  // eslint-disable-next-line prefer-const
+  let [user, team] = await Promise.all([
+    Users.findOneBy({ slack_user_id }),
+    Teams.findOneBy({
+      slack_team_id,
+    }),
+  ]);
+
+  if (!user && team) {
+    [user] = await Users.save([{ slack_user_id, team_id: team?.team_id }]);
+  }
+
+  if (user && !user.first_name) {
+    await Users.update(
+      { slack_user_id },
+      {
+        profile_image,
+        first_name,
+        last_name,
+      },
+    );
+  }
+};
+
+const eventCallback = async (event: any): Promise<boolean> => {
+  const { type } = event;
+
+  switch (type) {
+    case EVENT_TYPE.MESSAGE: {
+      await messageCallback(event);
+
+      return true;
+    }
+    case EVENT_TYPE.USER_CHANGE: {
+      await messageCallback(event);
+
+      return true;
+    }
+    default: {
+      return false;
     }
   }
 };

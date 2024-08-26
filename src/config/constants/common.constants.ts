@@ -24,6 +24,7 @@ export const SLACK_INTERACTIVE_ACTIONS = {
 export const EVENT_TYPE = {
   MESSAGE: 'message',
   APP_MENTION: 'app_mention',
+  USER_CHANGE: 'user_change',
 };
 
 export const EVENT_SUBTYPE = {

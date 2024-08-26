@@ -27,6 +27,15 @@ export class Users extends BaseEntity {
   @Column({ type: 'enum', enum: STATUS, default: STATUS.ACTIVE })
   status: string;
 
+  @Column({ nullable: true })
+  profile_image: string;
+
+  @Column({ nullable: true })
+  first_name: string;
+
+  @Column({ nullable: true })
+  last_name: string;
+
   @CreateDateColumn({ type: 'timestamp' })
   @Index()
   readonly created_at?: Date;
