@@ -7,6 +7,7 @@ import type {
 import config from '../config';
 import GG_INVITE from '../config/constants/static/gg_invite';
 import { Installations } from '../database/entity/Installations';
+import { Teams } from '../database/entity/Teams';
 import cryptoUtils from './crypto.utils';
 
 const authorizeFn = async ({ team_id }) => {
@@ -53,7 +54,8 @@ const createMessage = async (
   } catch (e) {
     if (
       e.code === 'slack_webapi_platform_error' &&
-      e.data.error === 'not_in_channel'
+      (e.data.error === 'not_in_channel' ||
+        e.data.error === 'channel_not_found')
     ) {
       return {
         e: {
@@ -104,8 +106,36 @@ const getOAuthAccess = async (code: string) => {
   return response;
 };
 
+const teamDetails = async (team_id: number) => {
+  const installation = await authorizeFn({ team_id });
+  const app = new App({
+    token: installation.botToken,
+    // authorize: authorizeFn,
+    signingSecret: config.SLACK_SIGNING_SECRET,
+  });
+
+  const data = await Teams.findOneBy({ team_id });
+
+  const { ok, team } = await app.client.team.info({ team: data.slack_team_id });
+
+  if (!ok) {
+    return;
+  }
+
+  await Teams.update(
+    {
+      team_id: data.team_id,
+    },
+    {
+      domain: team.domain,
+      email_domain: team.email_domain,
+    },
+  );
+};
+
 export default {
   createMessage,
   replyEmoji,
   getOAuthAccess,
+  teamDetails,
 };

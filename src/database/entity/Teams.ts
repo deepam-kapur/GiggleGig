@@ -29,6 +29,15 @@ export class Teams extends BaseEntity {
   @Column({ type: 'enum', enum: STATUS, default: STATUS.ACTIVE })
   status: string;
 
+  @Column({ type: 'varchar', length: 512, nullable: true })
+  domain?: string;
+
+  @Column({ type: 'varchar', length: 512, nullable: true })
+  email_domain?: string;
+
+  @Column({ type: 'varchar', length: 512, nullable: true })
+  icon_image?: string;
+
   @CreateDateColumn({ type: 'timestamp' })
   readonly created_at?: Date;
 
