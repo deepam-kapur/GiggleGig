@@ -369,6 +369,10 @@ const eventCallback = async (event: any): Promise<undefined> => {
     channel: slack_channel_id,
   } = event;
 
+  if (type !== EVENT_TYPE.MESSAGE) {
+    return;
+  }
+
   const user = await Users.findOneBy({ slack_user_id });
 
   if (!(user?.status === STATUS.ACTIVE)) {
